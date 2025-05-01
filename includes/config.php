@@ -2,6 +2,8 @@
 session_start();
 define('SITE_NAME', 'Pendataan Kehadiran RemaCo');
 date_default_timezone_set('Asia/Jakarta');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // Set folder permission warning
 if (!is_writable(__DIR__ . '/../data')) {
