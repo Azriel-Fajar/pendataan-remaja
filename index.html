@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendataan Kehadiran RemaCo</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link href="assets/css/custom.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Pendataan Kehadiran RemaCo</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="view.html"><i class="fas fa-list"></i> View Attendance</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <h2 class="text-center mb-4">Record Attendance</h2>
+                
+                <div id="message" class="mb-3"></div>
+                
+                <div class="card shadow">
+                    <div class="card-body">
+                        <form id="attendanceForm">
+                            <div class="mb-3">
+                                <label for="date" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="date" name="date" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       placeholder="Enter member's name" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-check-circle"></i> Record Attendance
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <a href="view.html" class="btn btn-outline-secondary">
+                        <i class="fas fa-list"></i> View Today's Attendance
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="bg-dark text-white py-3 mt-auto">
+        <div class="container text-center">
+            <p class="m-0">&copy; <span id="currentYear"></span> Pendataan Kehadiran Persekutuan RemaCo</p>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year in footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            document.getElementById('date').max = today;
+            
+            // Focus name field
+            document.getElementById('name').focus();
+            
+            // Handle form submission
+            document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value.trim();
+                const date = document.getElementById('date').value;
+                
+                if (!name) {
+                    showMessage('Mohon masukkan nama.', 'danger');
+                    return;
+                }
+                
+                // Save to localStorage
+                saveAttendance(name, date);
+                
+                // Show success message
+                showMessage('Kehadiran berhasil dicatat!', 'success');
+                
+                // Reset form
+                document.getElementById('name').value = '';
+                document.getElementById('name').focus();
+            });
+            
+            // Function to save attendance to localStorage
+            function saveAttendance(name, date) {
+                // Get existing data or initialize empty array
+                const attendances = JSON.parse(localStorage.getItem('attendances') || '[]');
+                
+                // Add new attendance
+                attendances.push({
+                    id: Date.now().toString(),
+                    name: name,
+                    attendance_date: date,
+                    created_at: new Date().toISOString()
+                });
+                
+                // Save back to localStorage
+                localStorage.setItem('attendances', JSON.stringify(attendances));
+            }
+            
+            // Function to show messages
+            function showMessage(text, type) {
+                const messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = `<div class="alert alert-${type}">${text}</div>`;
+                
+                // Remove message after 3 seconds
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
