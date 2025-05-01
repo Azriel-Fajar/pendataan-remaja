@@ -77,10 +77,13 @@
                 </div>
                 
                 <div class="mt-3 d-flex flex-column flex-sm-row justify-content-between align-items-center">
-                    <div class="mb-2 mb-sm-0">
+                    <div class="mb-2 mb-sm-0 d-flex gap-2">
                         <a href="index.html" class="btn btn-outline-primary">
                             <i class="fas fa-plus-circle"></i> Add New Attendance
                         </a>
+                        <button id="deleteAllBtn" class="btn btn-outline-danger" disabled>
+                            <i class="fas fa-trash-alt"></i> Delete All
+                        </button>
                     </div>
                     <div>
                         <small class="text-muted" id="lastUpdated">
@@ -156,6 +159,10 @@
                 
                 document.getElementById('attendanceCount').textContent = 
                     `${filtered.length} member${filtered.length !== 1 ? 's' : ''}`;
+                
+                // Enable/disable delete all button
+                const deleteAllBtn = document.getElementById('deleteAllBtn');
+                deleteAllBtn.disabled = filtered.length === 0;
                 
                 // Update table
                 const tableContainer = document.getElementById('attendanceTable');
@@ -244,6 +251,24 @@
             document.getElementById('dateForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 loadAttendanceData();
+            });
+            
+            // Handle delete all button click
+            document.getElementById('deleteAllBtn').addEventListener('click', function() {
+                const selectedDate = document.getElementById('date').value;
+                const count = allAttendances.filter(a => a.attendance_date === selectedDate).length;
+                
+                if (confirm(`Are you sure you want to delete ALL ${count} attendance records for this date? This action cannot be undone.`)) {
+                    // Filter out all records for the selected date
+                    const updatedAttendances = allAttendances.filter(a => a.attendance_date !== selectedDate);
+                    localStorage.setItem('attendances', JSON.stringify(updatedAttendances));
+                    
+                    // Reload data
+                    loadAttendanceData();
+                    
+                    // Show success message
+                    showMessage(`All ${count} attendance records deleted successfully`, 'success');
+                }
             });
             
             // Helper function to escape HTML
